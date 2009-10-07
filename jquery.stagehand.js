@@ -30,8 +30,13 @@
     process: function(target) {
 
       if(target.position == $.stagehand.currentPosition) return;
-
-      (target.position > $.stagehand.currentPosition) ? incrementPosition() : decrementPosition();
+      if($.stagehand.currentPosition == null) {
+        startPosition();
+      } else if(target.position > $.stagehand.currentPosition) {
+        incrementPosition();
+      } else {
+        decrementPosition();
+      }
 
       var step = $.stagehand.steps[$.stagehand.currentPosition];
 
@@ -40,20 +45,16 @@
 
       $.stagehand.process(target);
 
+      function startPosition() {
+        $.stagehand.currentPosition = 0;
+      }
+
       function incrementPosition() {
-        if($.stagehand.currentPosition == null) {
-          $.stagehand.currentPosition = 0;
-        } else {
-          $.stagehand.currentPosition = $.stagehand.currentPosition + 1;
-        }
+        $.stagehand.currentPosition = $.stagehand.currentPosition + 1;
       }
 
       function decrementPosition() {
-        if($.stagehand.currentPosition == null) {
-          $.stagehand.currentPosition = 0;
-        } else {
-          $.stagehand.currentPosition = $.stagehand.currentPosition - 1;
-        }
+        $.stagehand.currentPosition = $.stagehand.currentPosition - 1;
       }
 
     },
@@ -67,13 +68,11 @@
     },
 
     add: function(name, modes){
-      var position = $.stagehand.steps.length
-      var step_down = new Step(name, 'down', position, modes['down']);
-      $.stagehand.steps.push(step_down);
-
-      position = $.stagehand.steps.length
-      var step_up = new Step(name, 'up', position, modes['up']);
-      $.stagehand.steps.push(step_up);
+      $.each(['down', 'up'], function(i, mode){
+        var position = $.stagehand.steps.length;
+        var step = new Step(name, mode, position, modes[mode]);
+        $.stagehand.steps.push(step);
+      });
     },
 
     find: function(name, mode) {
